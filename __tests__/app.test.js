@@ -18,3 +18,23 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/topics", () => {
+  test("200: Responds with an array of all topics with slug and descriptions", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body: { topics } }) => {
+        expect(Array.isArray(topics)).toBe(true);
+        expect(topics.length).toBe(3);
+        topics.forEach(topic => {
+          expect(typeof topic.slug).toBe("string")
+          expect(typeof topic.description).toBe("string")
+        });
+        expect(topics[0]).toEqual({
+          description: 'The man, the Mitch, the legend',
+          slug: 'mitch'
+        })
+      });
+  });
+});
