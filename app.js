@@ -1,7 +1,7 @@
 const express = require("express");
-const { getEndpointsDescription } = require("./controllers/api.controller");
+const { getEndpointDescription } = require("./controllers/api.controller");
 const app = express();
 
-app.get("/api", getEndpointsDescription)
+app.get("/api", getEndpointDescription)
 
 module.exports = app;
