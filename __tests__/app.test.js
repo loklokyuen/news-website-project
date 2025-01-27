@@ -42,7 +42,7 @@ describe("GET /api/topics", () => {
 describe("GET non-existent endpoints", ()=>{
   test("404: Responds with an appropriate status and error message if accessing a non-existent endpoint", ()=>{
     return request(app)
-      .get("/api/donotexist")
+      .get("/not-a-route")
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Page not found")
