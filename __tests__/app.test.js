@@ -75,7 +75,7 @@ describe("GET /api/articles", ()=>{
         .get("/api/articles/one")
         .expect(400)
         .then(({ body: { msg } })=>{
-            expect(msg).toBe("Bad request")
+          expect(msg).toBe("Bad request")
         })
     })
     test("404: Responds with an appropriate status and error message if the article id is out of range", ()=>{
@@ -83,7 +83,41 @@ describe("GET /api/articles", ()=>{
         .get("/api/articles/999")
         .expect(404)
         .then(({ body: { msg } })=>{
-            expect(msg).toBe("Article not found")
+          expect(msg).toBe("Article not found")
+      })
+    })
+  })
+
+  describe("GET /api/articles", ()=>{
+    test("200: Responds with an array of all articles sorted descendingly", ()=>{
+      const expectedOutput = {
+        article_id: 3,
+        title: "Eight pug gifs that remind me of mitch",
+        topic: "mitch",
+        author: "icellusedkars",
+        created_at: expect.any(String),
+        article_img_url:
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        votes: 0,
+        comment_count: "2"
+      }
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } })=>{
+          articles.forEach(article => {
+            expect(typeof article.author).toBe("string")
+            expect(typeof article.title).toBe("string")
+            expect(typeof article.article_id).toBe("number")
+            expect(typeof article.topic).toBe("string")
+            expect(typeof article.created_at).toBe("string")
+            expect(typeof article.votes).toBe("number")
+            expect(typeof article.article_img_url).toBe("string")
+            expect( Number(article.comment_count) ).not.toBeNaN()
+            expect(article).not.toHaveProperty("body");
+          });
+          expect(articles).toBeSortedBy('created_at', { descending: true })
+          expect(articles[0]).toMatchObject(expectedOutput)
         })
     })
   })
