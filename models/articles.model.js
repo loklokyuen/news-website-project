@@ -11,3 +11,12 @@ exports.selectArticleById = (id)=>{
         return result.rows[0]
     })
 }
+
+exports.selectArticles = ()=>{
+    return db.query(`
+        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count 
+        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id) 
+        GROUP BY article_id ORDER BY created_at DESC`).then((result)=>{
+            return result.rows
+    })
+}
