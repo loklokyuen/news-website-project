@@ -163,7 +163,7 @@ describe("GET /api/articles", ()=>{
         .expect(404)
         .then(({ body: { msg } })=>{
           expect(msg).toBe("Article not found")
-      })
+        })
     })
   })
 })
@@ -213,7 +213,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body: { msg } })=>{
         expect(msg).toBe("Article not found")
-    })
+      })
   })
   test("400: Responds with an appropriate status and error message if the username or comment body is missing in the request sent", ()=>{
     const commentToAdd = { username: "butter_bridge" }
@@ -236,6 +236,82 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body: { msg } })=>{
         expect(msg).toBe("User not found")
+      })
+  })
+})
+
+describe("PATCH /api/articles/:article_id", ()=>{
+  test("200: Responds with an article object with the votes increased as expected", ()=>{
+    const voteChange = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(voteChange)
+      .expect(200)
+      .then(({ body: { updatedArticle } })=>{
+        expect(updatedArticle).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: expect.any(String),
+          votes: 101,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        })
     })
   })
+  test("200: Responds with an article object with the votes decreased as expected", ()=>{
+    const voteChange = { inc_votes: -99 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(voteChange)
+      .expect(200)
+      .then(({ body: { updatedArticle } })=>{
+        expect(updatedArticle).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: expect.any(String),
+          votes: 1,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        })
+    })
+  })
+  test("400: Responds with an appropriate status and error message if the article id is not a number", ()=>{
+    const voteChange = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/one")
+      .send(voteChange)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+  test("404: Responds with an appropriate status and error message if the article with the article id does not exist", ()=>{
+    const voteChange = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/99")
+      .send(voteChange)
+      .expect(404)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Article not found")
+      })
+  })
+    test("400: Responds with an appropriate status and error message if the vote increase input is not a number", ()=>{
+    const voteChange = { inc_votes: "five" };
+    return request(app)
+      .patch("/api/articles/one")
+      .send(voteChange)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+})
+
+describe("validate article id", ()=>{
+
 })
