@@ -1,4 +1,5 @@
 const db = require("../db/connection")
+const { checkArticleExists } = require("../utils/checkArticleExists")
 
 exports.selectArticleById = (id)=>{
     if ( isNaN( Number(id) ) ){
@@ -18,5 +19,19 @@ exports.selectArticles = ()=>{
         FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id) 
         GROUP BY article_id ORDER BY created_at DESC`).then((result)=>{
             return result.rows
+    })
+}
+
+exports.selectCommentsByArticleId = (id)=>{
+    if ( isNaN( Number(id) ) ){
+        return Promise.reject({code: 400, msg: "Bad request"})
+    }
+    return checkArticleExists(id).then(()=>{
+        return db.query(`SELECT comment_id, c.votes, c.created_at, c.author, c.body, article_id
+            FROM articles AS a INNER JOIN comments AS c USING (article_id)
+            WHERE article_id = $1 ORDER BY c.created_at DESC`, [id])
+    })
+    .then((result)=>{
+        return result.rows
     })
 }
