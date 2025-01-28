@@ -1,11 +1,11 @@
 const db = require("../db/connection")
-const { checkArticleExists } = require("../utils/checkArticleExists")
+const { checkArticleExists, checkUserExists } = require("../utils/checkExistenceInDB")
 
-exports.selectArticleById = (id)=>{
-    if ( isNaN( Number(id) ) ){
+exports.selectArticleById = (article_id)=>{
+    if ( isNaN( Number(article_id) ) ){
         return Promise.reject({code: 400, msg: "Bad request"})
     }
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id]).then((result)=>{
+    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]).then((result)=>{
         if (result.rows.length === 0){
             return Promise.reject({code: 404, msg: "Article not found"})
         }
@@ -22,16 +22,33 @@ exports.selectArticles = ()=>{
     })
 }
 
-exports.selectCommentsByArticleId = (id)=>{
-    if ( isNaN( Number(id) ) ){
+exports.selectCommentsByArticleId = (article_id)=>{
+    if ( isNaN( Number(article_id) ) ){
         return Promise.reject({code: 400, msg: "Bad request"})
     }
-    return checkArticleExists(id).then(()=>{
+    return checkArticleExists(article_id)
+    .then(()=>{
         return db.query(`SELECT comment_id, c.votes, c.created_at, c.author, c.body, article_id
             FROM articles AS a INNER JOIN comments AS c USING (article_id)
-            WHERE article_id = $1 ORDER BY c.created_at DESC`, [id])
+            WHERE article_id = $1 ORDER BY c.created_at DESC`, [article_id])
     })
     .then((result)=>{
         return result.rows
+    })
+}
+
+exports.insertCommentToArticle = (article_id, username, body)=>{
+    if ( isNaN( Number(article_id) ) || !username || !body ){
+        return Promise.reject({code: 400, msg: "Bad request"})
+    }
+    return checkArticleExists(article_id)
+    .then(()=>{
+        return checkUserExists(username)
+    })
+    .then(()=>{
+        return db.query(`INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *`, [body, article_id, username])
+    })
+    .then((result)=>{
+        return result.rows[0]
     })
 }

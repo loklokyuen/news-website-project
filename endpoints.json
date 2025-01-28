@@ -55,5 +55,20 @@
           "article_id": 1
         }]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves a comment object that is inserted to the table comments",
+    "body": ["username", "body"],
+    "queries": [],
+    "exampleResponse": {
+      "comments": [{
+          "comment_id": 2,
+          "author": "icellusedkars",
+          "body": "I hate streaming noses",
+          "created_at": "2020-10-16T05:03:00.000Z",
+          "votes": 0,
+          "article_id": 1
+        }]
+    }
   }
 }
