@@ -1,8 +1,9 @@
 const express = require("express");
 const { getEndpointDescription } = require("./controllers/api.controller");
 const { getTopics } = require("./controllers/topics.controller");
-const { handleCustomErrors, handleServerErrors } = require("./errors");
+const { handleCustomErrors, handleServerErrors, handlePSQLErrors } = require("./errors");
 const { getArticleById, getArticles, getCommentsByArticleId, postCommentOnArticle, patchArticleVotes } = require("./controllers/articles.controller");
+const { deleteCommentById } = require("./controllers/comments.controller");
 const app = express();
 
 app.use(express.json())
@@ -17,11 +18,14 @@ app.post("/api/articles/:article_id/comments", postCommentOnArticle)
 
 app.patch("/api/articles/:article_id", patchArticleVotes)
 
+app.delete("/api/comments/:comment_id", deleteCommentById)
+
 app.all("/*", (req, res)=>{
     res.status(404).send({ msg: "Page not found" });
 })
 
 app.use(handleCustomErrors)
+app.use(handlePSQLErrors)
 app.use(handleServerErrors)
 
 module.exports = app;
