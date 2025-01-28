@@ -3,7 +3,13 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
-const { checkArticleExists } = require("../utils/checkArticleExists");
+const { checkArticleExists, checkUserExists } = require("../utils/checkExistenceInDB");
+const seed = require('../db/seeds/seed.js');
+const db = require('../db/connection.js');
+const testData = require('../db/data/test-data/index.js');
+
+beforeEach(()=>{ return seed(testData) })
+afterAll(()=>{ return db.end() })
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -110,5 +116,14 @@ describe("checkArticleExists", () => {
   })
   test("resolves when the article with the given id exists", () => {
     return expect(checkArticleExists(1)).resolves.toMatch("Article exists");
+  })
+})
+
+describe("checkUserExists", () => {
+  test("rejects when a user with the given username does not exist", () => {
+    return expect(checkUserExists("new_usesr")).rejects.toMatchObject({code: 404, msg: "User not found"});
+  })
+  test("resolves when the user with the given username exists", () => {
+    return expect(checkUserExists("butter_bridge")).resolves.toMatch("User exists");
   })
 })

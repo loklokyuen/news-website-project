@@ -166,6 +166,76 @@ describe("GET /api/articles", ()=>{
       })
     })
   })
+})
 
-
+describe("POST /api/articles/:article_id/comments", () => {
+  test("200: Responds with a comment object that is inserted to the specified article", ()=>{
+    const commentToAdd = {
+      username: "butter_bridge",
+      body: "So insightful!"
+    }
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(commentToAdd)
+      .expect(200)
+      .then(({ body: { insertedComment } })=>{
+        expect(insertedComment).toMatchObject({
+          comment_id: 19,
+          body: "So insightful!",
+          article_id: 2,
+          author: "butter_bridge",
+          votes: 0,
+          created_at: expect.any(String)
+        })
+      })
+  })
+  test("400: Responds with an appropriate status and error message if the article id is not a number", ()=>{
+    const commentToAdd = {
+      username: "butter_bridge",
+      body: "So insightful!"
+    }
+    return request(app)
+      .post("/api/articles/one/comments")
+      .send(commentToAdd)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+  test("404: Responds with an appropriate status and error message if the article with the article id does not exist", ()=>{
+    const commentToAdd = {
+      username: "butter_bridge",
+      body: "So insightful!"
+    }
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send(commentToAdd)
+      .expect(404)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Article not found")
+    })
+  })
+  test("400: Responds with an appropriate status and error message if the username or comment body is missing in the request sent", ()=>{
+    const commentToAdd = { username: "butter_bridge" }
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(commentToAdd)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+  test("404: Responds with an appropriate status and error message if the user with the specified username does not exist", ()=>{
+    const commentToAdd = {
+      username: "no_user",
+      body: "Interesting!"
+    }
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(commentToAdd)
+      .expect(404)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("User not found")
+    })
+  })
 })
