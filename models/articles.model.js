@@ -1,14 +1,7 @@
 const db = require("../db/connection")
 const { checkArticleExists, checkUserExists } = require("../utils/checkExistenceInDB")
 
-function isNotANumber(value){
-    return isNaN( Number(value) )
-}
-
 exports.selectArticleById = (article_id)=>{
-    if ( isNotANumber(article_id) ){
-        return Promise.reject({code: 400, msg: "Bad request"})
-    }
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]).then((result)=>{
         if (result.rows.length === 0){
             return Promise.reject({code: 404, msg: "Article not found"})
@@ -27,9 +20,6 @@ exports.selectArticles = ()=>{
 }
 
 exports.selectCommentsByArticleId = (article_id)=>{
-    if ( isNotANumber(article_id) ){
-        return Promise.reject({code: 400, msg: "Bad request"})
-    }
     return checkArticleExists(article_id)
     .then(()=>{
         return db.query(`SELECT comment_id, c.votes, c.created_at, c.author, c.body, article_id
@@ -42,7 +32,7 @@ exports.selectCommentsByArticleId = (article_id)=>{
 }
 
 exports.insertCommentToArticle = (article_id, username, body)=>{
-    if ( isNotANumber(article_id) || !username || !body ){
+    if ( !username || !body ){
         return Promise.reject({code: 400, msg: "Bad request"})
     }
     return checkArticleExists(article_id)
@@ -58,9 +48,6 @@ exports.insertCommentToArticle = (article_id, username, body)=>{
 }
 
 exports.updateVotesOfArticle = (article_id, voteChange)=>{
-    if ( isNotANumber(article_id) || isNotANumber(voteChange) ){
-        return Promise.reject({code: 400, msg: "Bad request"})
-    }
     return checkArticleExists(article_id)
     .then(()=>{
         return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [voteChange, article_id])
