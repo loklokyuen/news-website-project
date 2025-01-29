@@ -1,5 +1,5 @@
 const db = require("../db/connection")
-const { checkArticleExists, checkUserExists } = require("../utils/checkExistenceInDB")
+const { checkArticleExists, checkUserExists, checkTopicExists } = require("../utils/checkExistenceInDB")
 
 exports.selectArticleById = (article_id)=>{
     return db.query(`SELECT a.author, title, a.article_id, a.body, topic, a.created_at, 
@@ -15,30 +15,23 @@ exports.selectArticleById = (article_id)=>{
 }
 
 exports.selectArticles = (sort_by = "created_at", order = "desc", topic)=>{
-    let sqlString = `
+    let baseQuery = `
         SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count 
-        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)`
-
-    let topicCheckPromise = Promise.resolve(true);
+        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)`;
+    let whereClause = ''
     if ( topic ){
-        topicCheckPromise = db.query(`SELECT 1 from topics WHERE slug = $1`, [topic]).then(({ rows })=>{
-            if (rows.length === 0){
-                return Promise.reject({code: 404, msg: `Topic ${topic} not found`})
-            }
-            sqlString += ` WHERE topic = '${topic}'`
-        })
+        whereClause= ` WHERE topic = '${topic}'`
     }
-    return topicCheckPromise.then(()=>{
-        sqlString += ` GROUP BY article_id`
+    return ( topic? checkTopicExists(topic) : Promise.resolve() )
+    .then(()=>{
         const sortByGreenlist = ["author", "title", "article_id", "created_at", "votes", "article_img_url", "comment_count"]
         const orderGreenlist = ["asc", "desc"]
-        if ( sortByGreenlist.some(item => item.toLowerCase() === sort_by.toLowerCase()) &&
-             orderGreenlist.some(item => item.toLowerCase() === order.toLowerCase())){
-            sqlString += ` ORDER BY ${sort_by} ${order}`
-        } else {
+        if ( !sortByGreenlist.some(item => item.toLowerCase() === sort_by.toLowerCase()) ||
+             !orderGreenlist.some(item => item.toLowerCase() === order.toLowerCase())){
             return Promise.reject({code: 400, msg: "Bad request"})
         }
-        return db.query(sqlString)
+        const fullQuery = `${baseQuery} ${whereClause} GROUP BY article_id ORDER BY ${sort_by} ${order}`
+        return db.query(fullQuery)
     })
     .then(({ rows })=>{
         return rows
