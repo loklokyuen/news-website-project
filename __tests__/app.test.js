@@ -216,6 +216,29 @@ describe("GET /api/articles", ()=>{
     })
   })
 
+  describe("GET /api/articles?topic=", ()=>{
+    test("200: Responds with an array of articles filtered by the specified topic", ()=>{
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body: { articles } })=>{
+          expect(articles.length).toBe(12)
+          articles.forEach(article => {
+            expect(article.topic).toBe("mitch")
+          });
+        })
+    })
+    test("404: Responds with an appropriate status and error message if request to filter by a topic that is not found", ()=>{
+      return request(app)
+        .get("/api/articles?topic=dogs")
+        .expect(404)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("Topic dogs not found")
+        })
+    })
+  })
+
+
   describe("GET /api/articles/:article_id/comments", ()=>{
     test("200: Responds with an array of all comments on a specified article, sorted by the newest first", ()=>{
       return request(app)
