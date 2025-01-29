@@ -22,16 +22,12 @@ exports.checkUserExists = (username)=>{
 }
 
 exports.checkTopicExists = (topic)=>{
-    if ( !topic ) {
-        return;
-    } else {
-        return db.query(`SELECT 1 FROM topics WHERE slug = $1`, [topic])
-        .then(({ rows })=>{
-            if (rows.length === 0){
-                return Promise.reject({code: 404, msg: `Topic not found`})
-            } else {
-                return "Topic exists"
-            }
-        })
-    }x
+    return db.query(`SELECT 1 FROM topics WHERE slug = $1`, [topic])
+    .then(({ rows })=>{
+        if (rows.length === 0){
+            return Promise.reject({code: 404, msg: `Topic not found`})
+        } else {
+            return "Topic exists"
+        }
+    })
 }

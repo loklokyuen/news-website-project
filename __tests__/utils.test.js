@@ -3,7 +3,7 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
-const { checkArticleExists, checkUserExists } = require("../utils/checkExistenceInDB");
+const { checkArticleExists, checkUserExists, checkTopicExists } = require("../utils/checkExistenceInDB");
 const seed = require('../db/seeds/seed.js');
 const db = require('../db/connection.js');
 const testData = require('../db/data/test-data/index.js');
@@ -130,9 +130,9 @@ describe("checkUserExists", () => {
 
 describe("checkTopicExists", () => {
   test("rejects when a topic with the given slug does not exist", () => {
-    return expect(checkUserExists("new_usesr")).rejects.toMatchObject({code: 404, msg: "Topic not found"});
+    return expect(checkTopicExists("dogs")).rejects.toMatchObject({code: 404, msg: "Topic not found"});
   })
   test("resolves when the topic with the given slug exists", () => {
-    return expect(checkUserExists("butter_bridge")).resolves.toMatch("Topic exists");
+    return expect(checkTopicExists("cats")).resolves.toMatch("Topic exists");
   })
 })
