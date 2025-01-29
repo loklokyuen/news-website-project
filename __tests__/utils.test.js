@@ -127,3 +127,12 @@ describe("checkUserExists", () => {
     return expect(checkUserExists("butter_bridge")).resolves.toMatch("User exists");
   })
 })
+
+describe("checkTopicExists", () => {
+  test("rejects when a topic with the given slug does not exist", () => {
+    return expect(checkUserExists("new_usesr")).rejects.toMatchObject({code: 404, msg: "Topic not found"});
+  })
+  test("resolves when the topic with the given slug exists", () => {
+    return expect(checkUserExists("butter_bridge")).resolves.toMatch("Topic exists");
+  })
+})

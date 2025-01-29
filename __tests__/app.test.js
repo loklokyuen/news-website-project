@@ -234,7 +234,7 @@ describe("GET /api/articles", ()=>{
         .get("/api/articles?topic=dogs")
         .expect(404)
         .then(({ body: { msg } })=>{
-          expect(msg).toBe("Topic dogs not found")
+          expect(msg).toBe("Topic not found")
         })
     })
   })
