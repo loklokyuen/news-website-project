@@ -444,7 +444,7 @@ describe("DELETE: /api/comments/:comment_id", ()=>{
         expect(msg).toBe("Bad request")
       })
   })
-  test("404: Responds with an appropriate status and error message comment with the comment id out of range", () => {
+  test("404: Responds with an appropriate status and error message if the comment id is out of range", () => {
     return request(app)
       .delete("/api/comments/780")
       .expect(404)
@@ -455,19 +455,43 @@ describe("DELETE: /api/comments/:comment_id", ()=>{
 })
 
 describe("GET /api/users", ()=>{
-  test("200: Responds with an array of all users with username, name, avatar_url", ()=>{
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({ body: { users } }) => {
-        expect(Array.isArray(users)).toBe(true);
-        expect(users.length).toBe(4);
-        users.forEach(user => {
-          expect(typeof user.username).toBe("string")
-          expect(typeof user.name).toBe("string")
-          expect(typeof user.avatar_url).toBe("string")
-        });
+  describe("GET /api/users", ()=>{
+    test("200: Responds with an array of all users with username, name, avatar_url", ()=>{
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          expect(Array.isArray(users)).toBe(true);
+          expect(users.length).toBe(4);
+          users.forEach(user => {
+            expect(typeof user.username).toBe("string")
+            expect(typeof user.name).toBe("string")
+            expect(typeof user.avatar_url).toBe("string")
+          });
 
-      });
+        });
+    })
+  })
+  describe("GET /api/users/:username", ()=>{
+    test("200: Responds with a user object by specified username", ()=>{
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then(({ body: { user } })=>{
+          expect(user).toMatchObject({
+            username: 'butter_bridge',
+            name: 'jonny',
+            avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+          })
+        })
+    })
+    test("404: Responds with an appropriate status and error message if a user with the specified username cannot be found", () => {
+      return request(app)
+        .get("/api/users/not-a-user")
+        .expect(404)
+        .then(({ body: { msg }}) => {
+          expect(msg).toBe("User not found")
+        })
+    })
   })
 })
