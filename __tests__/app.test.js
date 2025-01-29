@@ -121,6 +121,100 @@ describe("GET /api/articles", ()=>{
         })
     })
   })
+  describe("sorting queries", ()=>{
+    describe("GET /api/articles?sort_by=", ()=>{
+      test("200: Responds with an array of all articles sorted by the specified column", ()=>{
+        const sortByNumberValuesInsideString = (a, b) => {
+          if (Number(a.cost_at_auction) > Number(b.cost_at_auction)) return 1
+          else if (Number(a.cost_at_auction) < Number(b.cost_at_auction)) return -1
+          else return 0
+        }
+        return request(app)
+          .get("/api/articles?sort_by=comment_count")
+          .expect(200)
+          .then(({ body: { articles } })=>{
+            articles.forEach(article => {
+              expect(typeof article.author).toBe("string")
+              expect(typeof article.title).toBe("string")
+              expect(typeof article.article_id).toBe("number")
+              expect(typeof article.topic).toBe("string")
+              expect(typeof article.created_at).toBe("string")
+              expect(typeof article.votes).toBe("number")
+              expect(typeof article.article_img_url).toBe("string")
+              expect( Number(article.comment_count) ).not.toBeNaN()
+              expect(article).not.toHaveProperty("body");
+            });
+            expect(articles).toBeSortedBy('comment_count', { descending: true, compare: sortByNumberValuesInsideString })
+          })
+      })
+      test("400: Responds with an appropriate status and error message if request to sort by an invalid parameter", ()=>{
+        return request(app)
+          .get("/api/articles?sort_by=time")
+          .expect(400)
+          .then(({ body: { msg } })=>{
+            expect(msg).toBe("Bad request")
+          })
+      })
+    })
+    describe("GET /api/articles?order=", ()=>{
+      test("200: Responds with an array of all articles ordered by the specified order", ()=>{
+        return request(app)
+          .get("/api/articles?order=asc")
+          .expect(200)
+          .then(({ body: { articles } })=>{
+            articles.forEach(article => {
+              expect(typeof article.author).toBe("string")
+              expect(typeof article.title).toBe("string")
+              expect(typeof article.article_id).toBe("number")
+              expect(typeof article.topic).toBe("string")
+              expect(typeof article.created_at).toBe("string")
+              expect(typeof article.votes).toBe("number")
+              expect(typeof article.article_img_url).toBe("string")
+              expect( Number(article.comment_count) ).not.toBeNaN()
+              expect(article).not.toHaveProperty("body");
+            });
+            expect(articles).toBeSortedBy('created_at', { descending: false})
+          })
+      })
+      test("400: Responds with an appropriate status and error message if request to order by an invalid order", ()=>{
+        return request(app)
+          .get("/api/articles?order=best")
+          .expect(400)
+          .then(({ body: { msg } })=>{
+            expect(msg).toBe("Bad request")
+          })
+      })
+    })
+    describe("GET /api/articles?sort_by&order", ()=>{
+      test("200: Responds with an array of all articles sorted by the specified column and order", ()=>{
+        return request(app)
+          .get("/api/articles?sort_by=title&order=asc")
+          .expect(200)
+          .then(({ body: { articles } })=>{
+            articles.forEach(article => {
+              expect(typeof article.author).toBe("string")
+              expect(typeof article.title).toBe("string")
+              expect(typeof article.article_id).toBe("number")
+              expect(typeof article.topic).toBe("string")
+              expect(typeof article.created_at).toBe("string")
+              expect(typeof article.votes).toBe("number")
+              expect(typeof article.article_img_url).toBe("string")
+              expect( Number(article.comment_count) ).not.toBeNaN()
+              expect(article).not.toHaveProperty("body");
+            });
+            expect(articles).toBeSortedBy('title')
+          })
+      })
+      test("400: Responds with an appropriate status and error message if request to sort by or order by invalid parameter", ()=>{
+        return request(app)
+          .get("/api/articles?sort_by=fun&order=desc")
+          .expect(400)
+          .then(({ body: { msg } })=>{
+            expect(msg).toBe("Bad request")
+          })
+      })
+    })
+  })
 
   describe("GET /api/articles/:article_id/comments", ()=>{
     test("200: Responds with an array of all comments on a specified article, sorted by the newest first", ()=>{
