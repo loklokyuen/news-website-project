@@ -4,7 +4,6 @@ exports.removeCommentById = (comment_id)=>{
     return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id])
     .then(({rowCount})=>{
         if (rowCount === 0){
-            console.log("reject")
             return Promise.reject({code: 404, msg: "Comment not found"})
         }
     })

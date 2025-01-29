@@ -10,11 +10,19 @@ exports.selectArticleById = (article_id)=>{
     })
 }
 
-exports.selectArticles = ()=>{
-    return db.query(`
+exports.selectArticles = (sort_by = "created_at", order = "desc")=>{
+    let sqlString = `
         SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count 
-        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id) 
-        GROUP BY article_id ORDER BY created_at DESC`).then((result)=>{
+        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id) GROUP BY article_id`
+    const sortByGreenlist = ["author", "title", "article_id", "created_at", "votes", "article_img_url", "comment_count"]
+    const orderGreenlist = ["asc", "desc"]
+    if ( sortByGreenlist.some(item => item.toLowerCase() === sort_by.toLowerCase()) &&
+        orderGreenlist.some(item => item.toLowerCase() === order.toLowerCase())){
+        sqlString += ` ORDER BY ${sort_by} ${order}`
+    } else {
+        return Promise.reject({code: 400, msg: "Bad request"})
+    }
+    return db.query(sqlString).then((result)=>{
             return result.rows
     })
 }
