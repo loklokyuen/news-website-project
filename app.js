@@ -5,22 +5,21 @@ const { handleCustomErrors, handleServerErrors, handlePSQLErrors } = require("./
 const { getArticleById, getArticles, getCommentsByArticleId, postCommentOnArticle, patchArticleVotes } = require("./controllers/articles.controller");
 const { deleteCommentById } = require("./controllers/comments.controller");
 const { getUsers } = require("./controllers/users.controller");
+const usersRouter = require("./routers/users-router");
+const articleRouter = require("./routers/articles-router");
+const commentRouter = require("./routers/comments-router");
+const topicsRouter = require("./routers/topics-router");
+
 const app = express();
 
 app.use(express.json())
 
 app.get("/api", getEndpointDescription)
-app.get("/api/topics", getTopics)
-app.get("/api/articles/:article_id", getArticleById)
-app.get("/api/articles", getArticles)
-app.get("/api/articles/:article_id/comments", getCommentsByArticleId)
-app.get("/api/users", getUsers)
 
-app.post("/api/articles/:article_id/comments", postCommentOnArticle)
-
-app.patch("/api/articles/:article_id", patchArticleVotes)
-
-app.delete("/api/comments/:comment_id", deleteCommentById)
+app.use("/api/topics", topicsRouter)
+app.use("/api/articles", articleRouter)
+app.use("/api/users", usersRouter)
+app.use("/api/comments", commentRouter)
 
 app.all("/*", (req, res)=>{
     res.status(404).send({ msg: "Page not found" });
