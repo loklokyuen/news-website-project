@@ -10,20 +10,34 @@ exports.selectArticleById = (article_id)=>{
     })
 }
 
-exports.selectArticles = (sort_by = "created_at", order = "desc")=>{
+exports.selectArticles = (sort_by = "created_at", order = "desc", topic)=>{
     let sqlString = `
         SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count 
-        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id) GROUP BY article_id`
-    const sortByGreenlist = ["author", "title", "article_id", "created_at", "votes", "article_img_url", "comment_count"]
-    const orderGreenlist = ["asc", "desc"]
-    if ( sortByGreenlist.some(item => item.toLowerCase() === sort_by.toLowerCase()) &&
-        orderGreenlist.some(item => item.toLowerCase() === order.toLowerCase())){
-        sqlString += ` ORDER BY ${sort_by} ${order}`
-    } else {
-        return Promise.reject({code: 400, msg: "Bad request"})
+        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)`
+
+    let topicCheckPromise = Promise.resolve(true);
+    if ( topic ){
+        topicCheckPromise = db.query(`SELECT 1 from topics WHERE slug = $1`, [topic]).then(({ rows })=>{
+            if (rows.length === 0){
+                return Promise.reject({code: 404, msg: `Topic ${topic} not found`})
+            }
+            sqlString += ` WHERE topic = '${topic}'`
+        })
     }
-    return db.query(sqlString).then((result)=>{
-            return result.rows
+    return topicCheckPromise.then(()=>{
+        sqlString += ` GROUP BY article_id`
+        const sortByGreenlist = ["author", "title", "article_id", "created_at", "votes", "article_img_url", "comment_count"]
+        const orderGreenlist = ["asc", "desc"]
+        if ( sortByGreenlist.some(item => item.toLowerCase() === sort_by.toLowerCase()) &&
+             orderGreenlist.some(item => item.toLowerCase() === order.toLowerCase())){
+            sqlString += ` ORDER BY ${sort_by} ${order}`
+        } else {
+            return Promise.reject({code: 400, msg: "Bad request"})
+        }
+        return db.query(sqlString)
+    })
+    .then(({ rows })=>{
+        return rows
     })
 }
 
