@@ -2,7 +2,11 @@ const db = require("../db/connection")
 const { checkArticleExists, checkUserExists } = require("../utils/checkExistenceInDB")
 
 exports.selectArticleById = (article_id)=>{
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id]).then((result)=>{
+    return db.query(`SELECT a.author, title, a.article_id, a.body, topic, a.created_at, 
+        a.votes, article_img_url, COUNT(c.comment_id) AS comment_count
+        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)
+        WHERE article_id = $1
+        GROUP BY article_id`, [article_id]).then((result)=>{
         if (result.rows.length === 0){
             return Promise.reject({code: 404, msg: "Article not found"})
         }
