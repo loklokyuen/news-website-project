@@ -454,6 +454,73 @@ describe("DELETE: /api/comments/:comment_id", ()=>{
   })
 })
 
+describe("PATCH /api/comments/:comment_id", ()=>{
+  test("200: Responds with an comment object with the votes increased as expected", ()=>{
+    const voteChange = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(voteChange)
+      .expect(200)
+      .then(({ body: { updatedComment } })=>{
+        expect(updatedComment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+        })
+    })
+  })
+  test("200: Responds with an comment object with the votes decreased as expected", ()=>{
+    const voteChange = { inc_votes: -15 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(voteChange)
+      .expect(200)
+      .then(({ body: { updatedComment } })=>{
+        expect(updatedComment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 1,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+        })
+    })
+  })
+  test("400: Responds with an appropriate status and error message if the comment id is not a number", ()=>{
+    const voteChange = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/comments/one")
+      .send(voteChange)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+  test("404: Responds with an appropriate status and error message if the comment id is out of range", ()=>{
+    const voteChange = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/comments/99")
+      .send(voteChange)
+      .expect(404)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Comment not found")
+      })
+  })
+    test("400: Responds with an appropriate status and error message if the vote increase input is not a number", ()=>{
+    const voteChange = { inc_votes: "five" };
+    return request(app)
+      .patch("/api/comments/one")
+      .send(voteChange)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+})
+
 describe("GET /api/users", ()=>{
   describe("GET /api/users", ()=>{
     test("200: Responds with an array of all users with username, name, avatar_url", ()=>{
