@@ -768,6 +768,30 @@ describe("PATCH /api/articles/:article_id", ()=>{
   })
 })
 
+describe("DELETE /api/articles/:article_id", ()=>{
+  test("204: Responds with no content when article successfully deleted", () => {
+    return request(app)
+      .delete("/api/articles/1")
+      .expect(204)
+  })
+  test("400: Responds with an appropriate status and error message if article id is not a number", () => {
+    return request(app)
+      .delete("/api/articles/test")
+      .expect(400)
+      .then(({ body: { msg }}) => {
+        expect(msg).toBe("Bad request")
+      })
+  })
+  test("404: Responds with an appropriate status and error message if the article id is out of range", () => {
+    return request(app)
+      .delete("/api/articles/780")
+      .expect(404)
+      .then(({ body: { msg }}) => {
+        expect(msg).toBe("Article not found")
+      })
+  })
+})
+
 describe("DELETE /api/comments/:comment_id", ()=>{
   test("204: Responds with no content when comment successfully deleted", () => {
     return request(app)
