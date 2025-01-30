@@ -1,6 +1,6 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves a json representation of all the available endpoints of the api"
   },
   "GET /api/topics": {
     "description": "serves an array of all topics",
@@ -25,7 +25,8 @@
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           "comment_count": "6"
         }
-      ]
+      ],
+      "total_count": "1"
     }
   },
   "GET /api/articles/:article_id": {
@@ -47,7 +48,7 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments on a single article by its id, sorted by the creation date in descending order",
-    "queries": [],
+    "queries": ["p", "limit"],
     "exampleResponse": {
       "comments": [{
           "comment_id": 2,
@@ -121,7 +122,7 @@
     "exampleResponse": {}
   },
   "PATCH /api/comments/:comment_id": {
-    "description": "serves a article object with the updated votes",
+    "description": "serves a comment object with the updated votes",
     "body": "inc_votes",
     "queries": [],
     "exampleResponse": {
@@ -145,10 +146,10 @@
   "GET /api/users/:username": {
     "description": "serves a user object by its username",
     "queries": [],
-    "exampleResponse": [  {
+    "exampleResponse":{
       "username": "butter_bridge",
       "name": "jonny",
       "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-    }]
+    }
   }
 }

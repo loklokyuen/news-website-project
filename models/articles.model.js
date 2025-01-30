@@ -49,12 +49,16 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic, page = 
     })
 }
 
-exports.selectCommentsByArticleId = (article_id)=>{
+exports.selectCommentsByArticleId = (article_id, page = 1, limit = 10)=>{
+    if ( isNaN( Number(page) ) || isNaN( Number(limit) )){
+        return Promise.reject({code: 400, msg: "Bad request"})
+    }
+    const offset = limit * (page - 1)
     return checkArticleExists(article_id)
     .then(()=>{
         return db.query(`SELECT comment_id, c.votes, c.created_at, c.author, c.body, article_id
             FROM articles AS a INNER JOIN comments AS c USING (article_id)
-            WHERE article_id = $1 ORDER BY c.created_at DESC`, [article_id])
+            WHERE article_id = $1 ORDER BY c.created_at DESC LIMIT $2 OFFSET $3`, [article_id, limit, offset])
     })
     .then(({ rows })=>{
         return rows
