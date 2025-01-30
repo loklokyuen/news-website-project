@@ -1,4 +1,4 @@
-const { selectArticleById, selectArticles, selectCommentsByArticleId, insertCommentToArticle, updateVotesOfArticle } = require("../models/articles.model")
+const { selectArticleById, selectArticles, selectCommentsByArticleId, insertCommentToArticle, updateVotesOfArticle, insertArticle } = require("../models/articles.model")
 
 exports.getArticleById = (req, res, next)=>{
     const { article_id } = req.params;
@@ -35,6 +35,16 @@ exports.postCommentOnArticle = (req, res, next)=>{
     const { username, body } = req.body;
     insertCommentToArticle(article_id, username, body).then((insertedComment)=>{
         res.status(200).send({ insertedComment })
+    })
+    .catch((err)=>{
+        next(err)
+    })
+}
+
+exports.postArticle = (req, res, next)=>{
+    const { author, title, body, topic, article_img_url } = req.body;
+    insertArticle(author, title, body, topic, article_img_url).then((insertedArticle)=>{
+        res.status(200).send({ insertedArticle })
     })
     .catch((err)=>{
         next(err)

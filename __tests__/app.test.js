@@ -286,75 +286,174 @@ describe("GET /api/articles", ()=>{
   })
 })
 
-describe("POST /api/articles/:article_id/comments", () => {
-  test("200: Responds with a comment object that is inserted to the specified article", ()=>{
-    const commentToAdd = {
-      username: "butter_bridge",
-      body: "So insightful!"
-    }
-    return request(app)
-      .post("/api/articles/2/comments")
-      .send(commentToAdd)
-      .expect(200)
-      .then(({ body: { insertedComment } })=>{
-        expect(insertedComment).toMatchObject({
-          comment_id: 19,
-          body: "So insightful!",
-          article_id: 2,
-          author: "butter_bridge",
-          votes: 0,
-          created_at: expect.any(String)
+describe("POST /api/articles",()=>{
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("200: Responds with a comment object that is inserted to the specified article", ()=>{
+      const commentToAdd = {
+        username: "butter_bridge",
+        body: "So insightful!"
+      }
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(commentToAdd)
+        .expect(200)
+        .then(({ body: { insertedComment } })=>{
+          expect(insertedComment).toMatchObject({
+            comment_id: 19,
+            body: "So insightful!",
+            article_id: 2,
+            author: "butter_bridge",
+            votes: 0,
+            created_at: expect.any(String)
+          })
         })
-      })
+    })
+    test("400: Responds with an appropriate status and error message if the article id is not a number", ()=>{
+      const commentToAdd = {
+        username: "butter_bridge",
+        body: "So insightful!"
+      }
+      return request(app)
+        .post("/api/articles/one/comments")
+        .send(commentToAdd)
+        .expect(400)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("Bad request")
+        })
+    })
+    test("404: Responds with an appropriate status and error message if the article with the article id does not exist", ()=>{
+      const commentToAdd = {
+        username: "butter_bridge",
+        body: "So insightful!"
+      }
+      return request(app)
+        .post("/api/articles/999/comments")
+        .send(commentToAdd)
+        .expect(404)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("Article not found")
+        })
+    })
+    test("400: Responds with an appropriate status and error message if the username or comment body is missing in the request sent", ()=>{
+      const commentToAdd = { username: "butter_bridge" }
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(commentToAdd)
+        .expect(400)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("Bad request")
+        })
+    })
+    test("404: Responds with an appropriate status and error message if the user with the specified username does not exist", ()=>{
+      const commentToAdd = {
+        username: "no_user",
+        body: "Interesting!"
+      }
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(commentToAdd)
+        .expect(404)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("User not found")
+        })
+    })
   })
-  test("400: Responds with an appropriate status and error message if the article id is not a number", ()=>{
-    const commentToAdd = {
-      username: "butter_bridge",
-      body: "So insightful!"
-    }
-    return request(app)
-      .post("/api/articles/one/comments")
-      .send(commentToAdd)
-      .expect(400)
-      .then(({ body: { msg } })=>{
-        expect(msg).toBe("Bad request")
-      })
-  })
-  test("404: Responds with an appropriate status and error message if the article with the article id does not exist", ()=>{
-    const commentToAdd = {
-      username: "butter_bridge",
-      body: "So insightful!"
-    }
-    return request(app)
-      .post("/api/articles/999/comments")
-      .send(commentToAdd)
-      .expect(404)
-      .then(({ body: { msg } })=>{
-        expect(msg).toBe("Article not found")
-      })
-  })
-  test("400: Responds with an appropriate status and error message if the username or comment body is missing in the request sent", ()=>{
-    const commentToAdd = { username: "butter_bridge" }
-    return request(app)
-      .post("/api/articles/2/comments")
-      .send(commentToAdd)
-      .expect(400)
-      .then(({ body: { msg } })=>{
-        expect(msg).toBe("Bad request")
-      })
-  })
-  test("404: Responds with an appropriate status and error message if the user with the specified username does not exist", ()=>{
-    const commentToAdd = {
-      username: "no_user",
-      body: "Interesting!"
-    }
-    return request(app)
-      .post("/api/articles/2/comments")
-      .send(commentToAdd)
-      .expect(404)
-      .then(({ body: { msg } })=>{
-        expect(msg).toBe("User not found")
-      })
+  describe("POST /api/articles", () => {
+    test("200: Responds with an article object that is added", ()=>{
+      const articleToAdd = {
+        author: "butter_bridge",
+        title: "Aren't cats so adorable?",
+        body: "I just can't resist them",
+        topic: "cats",
+        article_img_url: "https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg?w=700&h=700"
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(articleToAdd)
+        .expect(200)
+        .then(({ body: { insertedArticle } })=>{
+          expect(insertedArticle).toMatchObject({
+            article_id: 14,
+            title: "Aren't cats so adorable?",
+            body: "I just can't resist them",
+            topic: "cats",
+            author: "butter_bridge",
+            article_img_url: "https://images.pexels.com/photos/45170/kittens-cat-cat-puppy-rush-45170.jpeg?w=700&h=700",
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: "0"
+          })
+        })
+    })
+    test("200: Responds with an article object that is added, and gives a default article image if it is not provided", ()=>{
+      const articleToAdd = {
+        author: "butter_bridge",
+        title: "Aren't cats so adorable?",
+        body: "I just can't resist them",
+        topic: "cats",
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(articleToAdd)
+        .expect(200)
+        .then(({ body: { insertedArticle } })=>{
+          expect(insertedArticle).toMatchObject({
+            article_id: 14,
+            title: "Aren't cats so adorable?",
+            body: "I just can't resist them",
+            topic: "cats",
+            author: "butter_bridge",
+            article_img_url: "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: "0"
+          })
+        })
+    })
+    test("400: Responds with an appropriate status and error message if the some required property is not provided", ()=>{
+      const articleToAdd = {
+        author: "butter_bridge",
+        body: "I just can't resist them",
+        topic: "cats",
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(articleToAdd)
+        .expect(400)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("Bad request")
+        })
+    })
+    test("404: Responds with an appropriate status and error message if the user with the username does not exist", ()=>{
+      const articleToAdd = {
+        author: "cat_god",
+        title: "Aren't cats so adorable?",
+        body: "I just can't resist them",
+        topic: "cats",
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(articleToAdd)
+        .expect(404)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("User not found")
+        })
+    })
+    test("404: Responds with an appropriate status and error message if the topic does not exist", ()=>{
+      const articleToAdd = {
+        author: "butter_bridge",
+        title: "Aren't dogs so adorable?",
+        body: "I just can't resist them",
+        topic: "dogs",
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(articleToAdd)
+        .expect(404)
+        .then(({ body: { msg } })=>{
+          expect(msg).toBe("Topic not found")
+        })
+    })
   })
 })
 

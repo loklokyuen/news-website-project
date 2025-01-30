@@ -15,13 +15,15 @@
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 2,
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
           "created_at": "2018-05-30T15:59:13.341Z",
           "votes": 0,
-          "comment_count": 6
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": "6"
         }
       ]
     }
@@ -57,8 +59,31 @@
         }]
     }
   },
+  "POST /api/articles": {
+    "description": "serves an article object that is inserted",
+    "body": {
+      "required": ["author", "title", "body", "topic"],
+      "optional": ["article_img_url"]
+    },
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": 14,
+          "title": "Aren't cats so adorable?",
+          "body": "I just can't resist them",
+          "topic": "cats",
+          "author": "butter_bridge",
+          "article_img_url": "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+          "votes": 0,
+          "created_at": "2024-10-16T05:03:00.000Z",
+          "comment_count": "0"
+        }
+      ]
+    }
+  },
   "POST /api/articles/:article_id/comments": {
-    "description": "serves a comment object that is inserted to the table comments",
+    "description": "serves a comment object that is inserted to a specified article",
     "body": ["username", "body"],
     "queries": [],
     "exampleResponse": {
