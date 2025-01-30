@@ -35,7 +35,7 @@ exports.postCommentOnArticle = (req, res, next)=>{
     const { article_id } = req.params;
     const { username, body } = req.body;
     insertCommentToArticle(article_id, username, body).then((insertedComment)=>{
-        res.status(200).send({ insertedComment })
+        res.status(201).send({ insertedComment })
     })
     .catch((err)=>{
         next(err)
@@ -45,7 +45,7 @@ exports.postCommentOnArticle = (req, res, next)=>{
 exports.postArticle = (req, res, next)=>{
     const { author, title, body, topic, article_img_url } = req.body;
     insertArticle(author, title, body, topic, article_img_url).then((insertedArticle)=>{
-        res.status(200).send({ insertedArticle })
+        res.status(201).send({ insertedArticle })
     })
     .catch((err)=>{
         next(err)

@@ -32,6 +32,17 @@ exports.checkTopicExists = (topic)=>{
     })
 }
 
+exports.checkTopicDoesNotExist = (topic)=>{
+    return db.query(`SELECT 1 FROM topics WHERE slug = $1`, [topic])
+    .then(({ rows })=>{
+        if (rows.length === 0){
+            return "Topic does not exist";
+        } else {
+            return Promise.reject({code: 409, msg: `Topic already exists`});
+        }
+    })
+}
+
 exports.checkCommentExists = (comment_id)=>{
     return db.query(`SELECT 1 FROM comments WHERE comment_id = $1`, [comment_id])
     .then(({ rows })=>{
