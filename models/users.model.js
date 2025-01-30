@@ -1,4 +1,5 @@
 const db = require("../db/connection")
+const { checkUserExists } = require("../utils/checkExistenceInDB")
 
 exports.selectUsers = ()=>{
     return db.query(`SELECT * FROM users`)
@@ -8,11 +9,11 @@ exports.selectUsers = ()=>{
 }
 
 exports.selectUserByUsername = (username)=>{
-    return db.query(`SELECT * FROM users WHERE username = $1`, [username])
+    return checkUserExists(username)
+    .then(()=>{
+        return db.query(`SELECT * FROM users WHERE username = $1`, [username])
+    })
     .then(({ rows })=>{
-        if ( rows.length === 0 ){
-            return Promise.reject({ code: 404, msg: "User not found"})
-        }
         return rows[0]
     })
 }
