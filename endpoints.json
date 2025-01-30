@@ -129,6 +129,11 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes a specific article by article id",
+    "queries": [],
+    "exampleResponse": {}
+  },
   "DELETE /api/comments/:comment_id": {
     "description": "deletes a specific comment by comment id",
     "queries": [],
