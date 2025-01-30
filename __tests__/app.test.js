@@ -39,6 +39,64 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", ()=>{
+  test("200: Responds with the newly created topic", ()=>{
+    const topicToAdd = {
+      slug: "dogs",
+      description: "Not cats"
+    }
+    return request(app)
+      .post("/api/topics")
+      .send(topicToAdd)
+      .expect(201)
+      .then(({ body: { insertedTopic } })=>{
+        expect(insertedTopic).toMatchObject({
+          slug: "dogs",
+          description: "Not cats"
+        })
+      })
+  })
+  test("200: Responds with the newly created topic, when the optional description is not provided", ()=>{
+    const topicToAdd = {
+      slug: "dogs"
+    }
+    return request(app)
+      .post("/api/topics")
+      .send(topicToAdd)
+      .expect(201)
+      .then(({ body: { insertedTopic } })=>{
+        expect(insertedTopic).toMatchObject({
+          slug: "dogs"
+        })
+      })
+  })
+  test("400: Responds with an appropriate status and error message if slug is missing", ()=>{
+    const topicToAdd = {
+      description: "Not cats"
+    }
+    return request(app)
+      .post("/api/topics")
+      .send(topicToAdd)
+      .expect(400)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Bad request")
+      })
+  })
+  test("409: Responds with an appropriate status and error message if the topic with the provided slug already exist", ()=>{
+    const topicToAdd = {
+      slug: "cats",
+      description: "Not dogs, not pigs"
+    }
+    return request(app)
+      .post("/api/topics")
+      .send(topicToAdd)
+      .expect(409)
+      .then(({ body: { msg } })=>{
+        expect(msg).toBe("Topic already exists")
+      })
+  })
+})
+
 describe("GET non-existent endpoints", ()=>{
   test("404: Responds with an appropriate status and error message if accessing a non-existent endpoint", ()=>{
     return request(app)
@@ -469,7 +527,7 @@ describe("GET /api/articles", ()=>{
 
 describe("POST /api/articles",()=>{
   describe("POST /api/articles/:article_id/comments", () => {
-    test("200: Responds with a comment object that is inserted to the specified article", ()=>{
+    test("200: Responds with the newly create comment to the specified article", ()=>{
       const commentToAdd = {
         username: "butter_bridge",
         body: "So insightful!"
@@ -477,7 +535,7 @@ describe("POST /api/articles",()=>{
       return request(app)
         .post("/api/articles/2/comments")
         .send(commentToAdd)
-        .expect(200)
+        .expect(201)
         .then(({ body: { insertedComment } })=>{
           expect(insertedComment).toMatchObject({
             comment_id: 19,
@@ -540,7 +598,7 @@ describe("POST /api/articles",()=>{
     })
   })
   describe("POST /api/articles", () => {
-    test("200: Responds with an article object that is added", ()=>{
+    test("200: Responds with the newly created article", ()=>{
       const articleToAdd = {
         author: "butter_bridge",
         title: "Aren't cats so adorable?",
@@ -551,7 +609,7 @@ describe("POST /api/articles",()=>{
       return request(app)
         .post("/api/articles")
         .send(articleToAdd)
-        .expect(200)
+        .expect(201)
         .then(({ body: { insertedArticle } })=>{
           expect(insertedArticle).toMatchObject({
             article_id: 14,
@@ -566,7 +624,7 @@ describe("POST /api/articles",()=>{
           })
         })
     })
-    test("200: Responds with an article object that is added, and gives a default article image if it is not provided", ()=>{
+    test("200: Responds with the newly created article, with s a default article image if not provided", ()=>{
       const articleToAdd = {
         author: "butter_bridge",
         title: "Aren't cats so adorable?",
@@ -576,7 +634,7 @@ describe("POST /api/articles",()=>{
       return request(app)
         .post("/api/articles")
         .send(articleToAdd)
-        .expect(200)
+        .expect(201)
         .then(({ body: { insertedArticle } })=>{
           expect(insertedArticle).toMatchObject({
             article_id: 14,

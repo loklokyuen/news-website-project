@@ -9,6 +9,17 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "POST /api/topics": {
+    "description": "serves the newly created topic object",
+    "body": {
+      "required": ["slug"],
+      "optional": ["description"]
+    },
+    "queries": [],
+    "exampleResponse": {
+      "insertedTopic": { "slug": "football", "description": "Footie!" }
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles, sorted by creation date in descending order, with 10 articles per page by default",
     "queries": ["author", "topic", "sort_by", "order", "p", "limit"],
@@ -61,15 +72,14 @@
     }
   },
   "POST /api/articles": {
-    "description": "serves an article object that is inserted",
+    "description": "serves the newly created article object",
     "body": {
       "required": ["author", "title", "body", "topic"],
-      "optional": ["article_img_url"]
+      "optional": "article_img_url"
     },
     "queries": [],
     "exampleResponse": {
-      "articles": [
-        {
+      "articles":  {
           "article_id": 14,
           "title": "Aren't cats so adorable?",
           "body": "I just can't resist them",
@@ -80,12 +90,13 @@
           "created_at": "2024-10-16T05:03:00.000Z",
           "comment_count": "0"
         }
-      ]
     }
   },
   "POST /api/articles/:article_id/comments": {
-    "description": "serves a comment object that is inserted to a specified article",
-    "body": ["username", "body"],
+    "description": "serves the newly created comment object that is inserted to a specified article",
+    "body": {
+      "required": ["username", "body"]
+    },
     "queries": [],
     "exampleResponse": {
       "insertedComment": {
@@ -100,7 +111,9 @@
   },
   "PATCH /api/articles/:article_id": {
     "description": "serves a article object with the updated votes",
-    "body": "inc_votes",
+    "body": {
+      "required":"inc_votes"
+    },
     "queries": [],
     "exampleResponse": {
       "updatedArticle": {
@@ -117,21 +130,25 @@
     }
   },
   "DELETE /api/comments/:comment_id": {
-    "description": "delete a specific comment by comment id",
+    "description": "deletes a specific comment by comment id",
     "queries": [],
     "exampleResponse": {}
   },
   "PATCH /api/comments/:comment_id": {
     "description": "serves a comment object with the updated votes",
-    "body": "inc_votes",
+    "body": {
+      "required":"inc_votes"
+    },
     "queries": [],
     "exampleResponse": {
-      "comment_id": 1,
-      "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-      "article_id": 9,
-      "author": "butter_bridge",
-      "votes": 17,
-      "created_at": "2020-04-06T12:17:00.000Z"
+      "updatedComment":{
+        "comment_id": 1,
+        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        "article_id": 9,
+        "author": "butter_bridge",
+        "votes": 17,
+        "created_at": "2020-04-06T12:17:00.000Z"
+      }
     }
   },
   "GET /api/users": {
