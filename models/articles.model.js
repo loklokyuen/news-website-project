@@ -14,15 +14,25 @@ exports.selectArticleById = (article_id)=>{
     })
 }
 
-exports.selectArticles = (sort_by = "created_at", order = "desc", topic)=>{
+exports.selectArticles = (sort_by = "created_at", order = "desc", topic, page = 1, limit = 10)=>{
+    if ( isNaN( Number(page) ) || isNaN( Number(limit) )){
+        return Promise.reject({code: 400, msg: "Bad request"})
+    }
     let baseQuery = `
-        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count 
+        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count
         FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)`;
     let whereClause = ''
     if ( topic ){
         whereClause= ` WHERE topic = '${topic}'`
     }
+    let totalCount;
     return ( topic? checkTopicExists(topic) : Promise.resolve() )
+    .then(()=>{
+        return db.query(`SELECT COUNT(*) FROM articles ${whereClause}`)
+    })
+    .then(({ rows })=>{
+        totalCount = rows[0].count;
+    })
     .then(()=>{
         const sortByGreenlist = ["author", "title", "article_id", "created_at", "votes", "article_img_url", "comment_count"]
         const orderGreenlist = ["asc", "desc"]
@@ -30,11 +40,12 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic)=>{
              !orderGreenlist.some(item => item.toLowerCase() === order.toLowerCase())){
             return Promise.reject({code: 400, msg: "Bad request"})
         }
-        const fullQuery = `${baseQuery} ${whereClause} GROUP BY article_id ORDER BY ${sort_by} ${order}`
+        const offset = limit * (page - 1)
+        const fullQuery = `${baseQuery} ${whereClause} GROUP BY article_id ORDER BY ${sort_by} ${order}  LIMIT ${limit} OFFSET ${offset}`
         return db.query(fullQuery)
     })
     .then(({ rows })=>{
-        return rows
+        return { articles: rows, total_count: totalCount }
     })
 }
 

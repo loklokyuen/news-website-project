@@ -11,9 +11,9 @@ exports.getArticleById = (req, res, next)=>{
 }
 
 exports.getArticles = (req, res, next)=>{
-    const { sort_by, order, topic } = req.query;
-    selectArticles(sort_by, order, topic).then((articles)=>{
-        res.status(200).send({ articles })
+    const { sort_by, order, topic, p, limit } = req.query;
+    selectArticles(sort_by, order, topic, p, limit).then((result)=>{
+        res.status(200).send(result)
     })
     .catch((err)=>{
         next(err)
