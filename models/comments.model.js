@@ -13,7 +13,7 @@ exports.updateVotesOfComment = (comment_id, voteChange)=>{
     .then(()=>{
         return db.query(`UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *`, [voteChange, comment_id])
     })
-    .then((result)=>{
-        return result.rows[0]
+    .then(({ rows })=>{
+        return rows[0]
     })
 }
