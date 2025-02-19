@@ -1,6 +1,6 @@
 # News and Discussion API 
 
-A RESTful API that enables users to retrieve articles, participate in discussions through comments, and organize content with topic tags. Features a voting system to highlight the most engaging content.
+A RESTful API that enables users to retrieve articles, participate in discussions through comments, and organize content with topic tags. Features a voting system to highlight the most engaging content. This is the backend API for the News and Discussion platform. The frontend repository can be found [here](https://github.com/loklokyuen/nc-news).
 
 ## Features
 - Retrieve, sort and filter news articles by topic
@@ -10,11 +10,17 @@ A RESTful API that enables users to retrieve articles, participate in discussion
 
 ## Usage
 
-The hosted version of this API is available at 
-https://news-and-discussion-platform.onrender.com/api. A complete list of available endpoints is listed on this page.
+The hosted version of this API is available [here](https://news-and-discussion-platform.onrender.com/api). A complete list of available endpoints is listed on this page. To explore the functionality of this API with a user-friendly interface, visit the [frontend web application](https://news-and-discussion.netlify.app/articles). This website provides an interactive way to browse articles, post comments, and vote on content using this API.
+
+## Tech Stack
+### Backend Technologies
+- **Runtime**: Node.js (v20)
+- **Framework**: Express.js
+- **Database**: PostgreSQL (v8)
+- **Testing**: Jest, Supertest
+- **Deployment**: Supabase, Render
 
 ## Local Development
-
 ### Pre-requisites
 Before development, make sure you have the followings installed:
 - Node.js (v20.15.1 or higher)
