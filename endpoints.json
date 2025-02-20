@@ -79,7 +79,7 @@
     },
     "queries": [],
     "exampleResponse": {
-      "articles":  {
+      "insertedArticle":  {
           "article_id": 14,
           "title": "Aren't cats so adorable?",
           "body": "I just can't resist them",
