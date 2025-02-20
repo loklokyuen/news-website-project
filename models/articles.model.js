@@ -19,7 +19,7 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic, page = 
         return Promise.reject({code: 400, msg: "Bad request"})
     }
     let baseQuery = `
-        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(*) AS comment_count
+        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(comment_id) AS comment_count
         FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)`;
     let whereClause = ''
     if ( topic ){
