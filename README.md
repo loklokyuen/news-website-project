@@ -21,7 +21,7 @@ The hosted version of this API is available [here](https://news-and-discussion-p
 - **Deployment**: Supabase, Render
 
 ## Local Development
-### Pre-requisites
+### Prerequisites
 Before development, make sure you have the followings installed:
 - Node.js (v20.15.1 or higher)
 - npm (10.8.2 or higher)
