@@ -277,8 +277,10 @@ describe("GET /api/articles", () => {
 					expect(articles[0].article_id).toBe(3);
 					expect(articles[1].article_id).toBe(6);
 					expect(articles[2].article_id).toBe(2);
-					expect(articles[3].article_id).toBe(12);
-					expect(articles[4].article_id).toBe(13);
+					// article_id 12 and 13 have the same created_at value
+					expect([12, 13]).toContain(articles[3].article_id);
+					expect([12, 13]).toContain(articles[4].article_id);
+					expect(articles[3].article_id).not.toBe(articles[4].article_id);
 					expect(articles[5].article_id).toBe(5);
 					expect(articles[6].article_id).toBe(1);
 					expect(articles[7].article_id).toBe(9);
@@ -386,6 +388,9 @@ describe("GET /api/articles", () => {
 							"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
 						votes: 0,
 						comment_count: "1",
+						avatar_url:
+							"https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+						name: "sam",
 					});
 				});
 		});

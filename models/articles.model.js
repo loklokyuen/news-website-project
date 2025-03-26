@@ -9,10 +9,11 @@ exports.selectArticleById = (article_id) => {
 	return db
 		.query(
 			`SELECT a.author, title, a.article_id, a.body, topic, a.created_at, 
-        a.votes, article_img_url, COUNT(c.comment_id) AS comment_count
+        a.votes, article_img_url, COUNT(c.comment_id) AS comment_count, u.avatar_url, u.name
         FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)
+        LEFT OUTER JOIN users AS u ON a.author = u.username
         WHERE article_id = $1
-        GROUP BY article_id`,
+        GROUP BY a.article_id, a.author, title, a.body, topic, a.created_at, a.votes, article_img_url, u.avatar_url, u.name`,
 			[article_id]
 		)
 		.then(({ rows }) => {
@@ -34,8 +35,8 @@ exports.selectArticles = (
 		return Promise.reject({ code: 400, msg: "Bad request" });
 	}
 	let baseQuery = `
-        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(comment_id) AS comment_count
-        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id)`;
+        SELECT a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, COUNT(comment_id) AS comment_count, u.avatar_url, u.name
+        FROM articles AS a LEFT OUTER JOIN comments AS c USING (article_id) LEFT OUTER JOIN users AS u ON a.author = u.username`;
 	let whereClause = "";
 	if (topic) {
 		whereClause = ` WHERE topic = '${topic}'`;
@@ -70,7 +71,8 @@ exports.selectArticles = (
 				return Promise.reject({ code: 400, msg: "Bad request" });
 			}
 			const offset = limit * (page - 1);
-			const fullQuery = `${baseQuery} ${whereClause} GROUP BY article_id ORDER BY ${sort_by} ${order}  LIMIT ${limit} OFFSET ${offset}`;
+			const fullQuery = `${baseQuery} ${whereClause} GROUP BY a.author, title, article_id, topic, a.created_at, a.votes, article_img_url, u.avatar_url, u.name
+            ORDER BY ${sort_by} ${order}  LIMIT ${limit} OFFSET ${offset}`;
 			return db.query(fullQuery);
 		})
 		.then(({ rows }) => {
