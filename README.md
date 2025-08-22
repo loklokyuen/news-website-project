@@ -3,10 +3,8 @@
 A RESTful API that enables users to retrieve articles, participate in discussions through comments, and organize content with topic tags. Features a voting system to highlight the most engaging content. 
 
 ## Quick Links
-- **Backend Repository (this repo)**: [GitHub Repo](https://github.com/loklokyuen/news-website-project) 
-- **Hosted API**: [Live Demo](https://news-and-discussion-platform.onrender.com/api)
-- **Frontend Repository**: [GitHub Repo](https://github.com/loklokyuen/nc-news)
-- **Frontend Web App**: [Browse Articles](https://nextcore-news.netlify.app/articles)
+- **Backend (API)**: [Repository](https://github.com/loklokyuen/news-website-project) • [Live Demo](https://news-and-discussion-platform.onrender.com/api)  
+- **Frontend (Web App)**: [Repository](https://github.com/loklokyuen/nc-news) • [Live Demo](https://nextcore-news.netlify.app/articles)
 
 ## Features
 - Retrieve, sort and filter news articles by topic
